@@ -14,12 +14,20 @@ type Monitor struct {
 
 func NewMonitor(registry *prometheus.Registry) *Monitor {
 	if registry == nil {
-		registry = prometheus.DefaultRegisterer.(*prometheus.Registry)
+		panic("registry can not be nil")
 	}
 	return &Monitor{
 		metrics:  make(map[string]*Metric),
 		registry: registry,
 	}
+}
+
+var (
+	m = NewMonitor(prometheus.DefaultRegisterer.(*prometheus.Registry))
+)
+
+func DefaultMonitor() *Monitor {
+	return m
 }
 
 // GetRegistry used to get prometheus registry.
