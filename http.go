@@ -3,13 +3,14 @@ package monitor
 import (
 	"fmt"
 	"net/http"
+	_ "net/http/pprof"
 	"runtime"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func Serve(g prometheus.Gatherer, opts ...httpConfigOption) {
+func Serve(port uint16, g prometheus.Gatherer, opts ...httpConfigOption) {
 	c := newHttpConfig()
 	c.apply(opts...)
 
@@ -19,7 +20,7 @@ func Serve(g prometheus.Gatherer, opts ...httpConfigOption) {
 
 	http.Handle(c.path, promhttp.HandlerFor(g, promhttp.HandlerOpts{ErrorHandling: promhttp.ContinueOnError}))
 	go func() {
-		if err := http.ListenAndServe(fmt.Sprintf(":%d", c.port), nil); err != nil {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 			panic(err)
 		}
 	}()
