@@ -2,20 +2,14 @@ package monitor
 
 import (
 	"fmt"
-	"net/http"
-	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Monitor is an object that uses to set gin server monitor.
 type Monitor struct {
 	metrics  map[string]*Metric
 	registry *prometheus.Registry
-
-	httpHandler     http.Handler
-	httpHandlerOnce sync.Once
 }
 
 func NewMonitor(registry *prometheus.Registry) *Monitor {
@@ -53,13 +47,4 @@ func (m *Monitor) AddMetric(metric *Metric) {
 	} else {
 		panic(fmt.Sprintf("metric type '%d' not existed.", metric.Type))
 	}
-}
-
-// HttpHandler used to generate http handler.
-// Usage: `http.Handle(path, m.HttpHandler())`
-func (m *Monitor) HttpHandler() http.Handler {
-	m.httpHandlerOnce.Do(func() {
-		m.httpHandler = promhttp.HandlerFor(m.registry, promhttp.HandlerOpts{ErrorHandling: promhttp.ContinueOnError})
-	})
-	return m.httpHandler
 }
