@@ -8,8 +8,9 @@ import (
 
 // Monitor is an object that uses to set gin server monitor.
 type Monitor struct {
-	metrics  map[string]*Metric
-	registry *prometheus.Registry
+	*prometheus.Registry
+
+	metrics map[string]*Metric
 }
 
 func NewMonitor(registry *prometheus.Registry) *Monitor {
@@ -18,7 +19,7 @@ func NewMonitor(registry *prometheus.Registry) *Monitor {
 	}
 	return &Monitor{
 		metrics:  make(map[string]*Metric),
-		registry: registry,
+		Registry: registry,
 	}
 }
 
@@ -32,7 +33,7 @@ func DefaultMonitor() *Monitor {
 
 // GetRegistry used to get prometheus registry.
 func (m *Monitor) GetRegistry() *prometheus.Registry {
-	return m.registry
+	return m.Registry
 }
 
 // GetMetric used to get metric object by metric_name.
@@ -50,7 +51,7 @@ func (m *Monitor) AddMetric(metric *Metric) {
 	}
 	if f, ok := promTypeHandler[metric.Type]; ok {
 		f(metric)
-		m.registry.MustRegister(metric.vec)
+		m.MustRegister(metric.vec)
 		m.metrics[metric.Name] = metric
 	} else {
 		panic(fmt.Sprintf("metric type '%d' not existed.", metric.Type))
