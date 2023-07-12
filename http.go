@@ -3,7 +3,7 @@ package monitor
 import (
 	"fmt"
 	"net/http"
-	_ "net/http/pprof"
+	"net/http/pprof"
 	"runtime"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -18,9 +18,16 @@ func Serve(port uint16, g prometheus.Gatherer, opts ...httpConfigOption) {
 	runtime.SetBlockProfileRate(1)     // 开启对阻塞操作的跟踪，block
 	runtime.SetMutexProfileFraction(1) // 开启对锁调用的跟踪，mutex
 
-	http.Handle(c.path, promhttp.HandlerFor(g, promhttp.HandlerOpts{ErrorHandling: promhttp.ContinueOnError}))
+	mux := http.NewServeMux()
+	mux.Handle(c.path, promhttp.HandlerFor(g, promhttp.HandlerOpts{ErrorHandling: promhttp.ContinueOnError}))
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
 	go func() {
-		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
 			panic(err)
 		}
 	}()

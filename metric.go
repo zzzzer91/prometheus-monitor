@@ -21,6 +21,7 @@ const (
 // metric data. Every metric should be globally unique by name.
 type Metric struct {
 	Type        MetricType
+	NameSpace   string
 	Name        string
 	Description string
 	Labels      []string
@@ -110,14 +111,14 @@ var (
 
 func counterHandler(metric *Metric) {
 	metric.vec = prometheus.NewCounterVec(
-		prometheus.CounterOpts{Name: metric.Name, Help: metric.Description},
+		prometheus.CounterOpts{Namespace: metric.NameSpace, Name: metric.Name, Help: metric.Description},
 		metric.Labels,
 	)
 }
 
 func gaugeHandler(metric *Metric) {
 	metric.vec = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{Name: metric.Name, Help: metric.Description},
+		prometheus.GaugeOpts{Namespace: metric.NameSpace, Name: metric.Name, Help: metric.Description},
 		metric.Labels,
 	)
 }
@@ -127,7 +128,7 @@ func histogramHandler(metric *Metric) {
 		panic(fmt.Sprintf("metric '%s' is histogram type, cannot lose bucket param.", metric.Name))
 	}
 	metric.vec = prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{Name: metric.Name, Help: metric.Description, Buckets: metric.Buckets},
+		prometheus.HistogramOpts{Namespace: metric.NameSpace, Name: metric.Name, Help: metric.Description, Buckets: metric.Buckets},
 		metric.Labels,
 	)
 }
@@ -137,7 +138,7 @@ func summaryHandler(metric *Metric) {
 		panic(fmt.Sprintf("metric '%s' is summary type, cannot lose objectives param.", metric.Name))
 	}
 	prometheus.NewSummaryVec(
-		prometheus.SummaryOpts{Name: metric.Name, Help: metric.Description, Objectives: metric.Objectives},
+		prometheus.SummaryOpts{Namespace: metric.NameSpace, Name: metric.Name, Help: metric.Description, Objectives: metric.Objectives},
 		metric.Labels,
 	)
 }
