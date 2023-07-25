@@ -14,9 +14,10 @@ func Serve(port uint16, g prometheus.Gatherer, opts ...httpConfigOption) {
 	c := newHttpConfig()
 	c.apply(opts...)
 
-	// 默认情况下 pprof 是不追踪block和mutex的信息的，如果想要看这两个信息，需要手动开启
-	runtime.SetBlockProfileRate(1)     // 开启对阻塞操作的跟踪，block
-	runtime.SetMutexProfileFraction(1) // 开启对锁调用的跟踪，mutex
+	// By default, pprof does not track information about blocks and mutexes.
+	// If you want to see this information, you need to enable it manually.
+	runtime.SetBlockProfileRate(1)
+	runtime.SetMutexProfileFraction(1)
 
 	mux := http.NewServeMux()
 	mux.Handle(c.path, promhttp.HandlerFor(g, promhttp.HandlerOpts{ErrorHandling: promhttp.ContinueOnError}))
