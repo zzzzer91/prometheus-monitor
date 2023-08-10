@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"runtime"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -27,8 +28,15 @@ func Serve(port uint16, g prometheus.Gatherer, opts ...httpConfigOption) {
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 
+	server := &http.Server{
+		Addr:         fmt.Sprintf(":%d", port),
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Handler:      mux,
+	}
+
 	go func() {
-		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+		if err := server.ListenAndServe(); err != nil {
 			panic(err)
 		}
 	}()
