@@ -34,7 +34,7 @@ type Metric struct {
 // SetGaugeValue set data for Gauge type Metric.
 func (m *Metric) SetGaugeValue(labelValues []string, value float64) error {
 	if m.Type == None {
-		return errors.Errorf("metric '%s' not existed.", m.Name)
+		return errors.Errorf("metric '%s' not existed", m.Name)
 	}
 
 	if m.Type != Gauge {
@@ -48,7 +48,7 @@ func (m *Metric) SetGaugeValue(labelValues []string, value float64) error {
 // the counter by 1
 func (m *Metric) Inc(labelValues []string) error {
 	if m.Type == None {
-		return errors.Errorf("metric '%s' not existed.", m.Name)
+		return errors.Errorf("metric '%s' not existed", m.Name)
 	}
 
 	if m.Type != Gauge && m.Type != Counter {
@@ -67,7 +67,7 @@ func (m *Metric) Inc(labelValues []string) error {
 // for Counter/Gauge type metric.
 func (m *Metric) Add(labelValues []string, value float64) error {
 	if m.Type == None {
-		return errors.Errorf("metric '%s' not existed.", m.Name)
+		return errors.Errorf("metric '%s' not existed", m.Name)
 	}
 
 	if m.Type != Gauge && m.Type != Counter {
@@ -86,7 +86,7 @@ func (m *Metric) Add(labelValues []string, value float64) error {
 // add observations.
 func (m *Metric) Observe(labelValues []string, value float64) error {
 	if m.Type == 0 {
-		return errors.Errorf("metric '%s' not existed.", m.Name)
+		return errors.Errorf("metric '%s' not existed", m.Name)
 	}
 	if m.Type != Histogram && m.Type != Summary {
 		return errors.Errorf("metric '%s' not Histogram or Summary type", m.Name)
@@ -125,7 +125,7 @@ func gaugeHandler(metric *Metric) {
 
 func histogramHandler(metric *Metric) {
 	if len(metric.Buckets) == 0 {
-		panic(fmt.Sprintf("metric '%s' is histogram type, cannot lose bucket param.", metric.Name))
+		panic(fmt.Sprintf("metric '%s' is histogram type, cannot lose bucket param", metric.Name))
 	}
 	metric.vec = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{Namespace: metric.NameSpace, Name: metric.Name, Help: metric.Description, Buckets: metric.Buckets},
@@ -135,7 +135,7 @@ func histogramHandler(metric *Metric) {
 
 func summaryHandler(metric *Metric) {
 	if len(metric.Objectives) == 0 {
-		panic(fmt.Sprintf("metric '%s' is summary type, cannot lose objectives param.", metric.Name))
+		panic(fmt.Sprintf("metric '%s' is summary type, cannot lose objectives param", metric.Name))
 	}
 	prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{Namespace: metric.NameSpace, Name: metric.Name, Help: metric.Description, Objectives: metric.Objectives},

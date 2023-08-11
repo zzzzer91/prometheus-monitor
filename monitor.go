@@ -47,13 +47,13 @@ func (m *Monitor) AddMetric(metric *Metric) {
 		panic(fmt.Sprintf("metric '%s' is existed", metric.Name))
 	}
 	if metric.Name == "" {
-		panic("metric name cannot be empty.")
+		panic("metric name cannot be empty")
 	}
 	if f, ok := promTypeHandler[metric.Type]; ok {
 		f(metric)
 		m.MustRegister(metric.vec)
 		m.metrics[metric.Name] = metric
 	} else {
-		panic(fmt.Sprintf("metric type '%d' not existed.", metric.Type))
+		panic(fmt.Sprintf("metric type '%d' not existed", metric.Type))
 	}
 }

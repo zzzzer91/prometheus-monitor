@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func Serve(port uint16, g prometheus.Gatherer, opts ...httpConfigOption) {
+func Serve(port uint16, g prometheus.Gatherer, opts ...ConfigOption) {
 	c := newHttpConfig()
 	c.apply(opts...)
 
@@ -29,10 +29,9 @@ func Serve(port uint16, g prometheus.Gatherer, opts ...httpConfigOption) {
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", port),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		Handler:      mux,
+		Addr:              fmt.Sprintf(":%d", port),
+		ReadHeaderTimeout: 5 * time.Second,
+		Handler:           mux,
 	}
 
 	go func() {

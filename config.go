@@ -1,25 +1,25 @@
 package monitor
 
-type httpConfig struct {
+type ConfigOption func(c *config)
+
+type config struct {
 	path string
 }
 
-func newHttpConfig() *httpConfig {
-	return &httpConfig{
+func newHttpConfig() *config {
+	return &config{
 		path: "/metrics",
 	}
 }
 
-func (c *httpConfig) apply(opts ...httpConfigOption) {
+func (c *config) apply(opts ...ConfigOption) {
 	for _, o := range opts {
 		o(c)
 	}
 }
 
-type httpConfigOption func(c *httpConfig)
-
-func WithPath(path string) httpConfigOption {
-	return func(c *httpConfig) {
+func WithPath(path string) ConfigOption {
+	return func(c *config) {
 		c.path = path
 	}
 }
